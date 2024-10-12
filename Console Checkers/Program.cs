@@ -2,6 +2,23 @@
 
 class Program
 {
+    public static void WorkingClear()
+    {
+        ConsoleColor SavedColor = Console.BackgroundColor;
+        Console.BackgroundColor = ConsoleColor.Black;
+        for (int j = 0; j < 3; j++)
+        {
+            for (int i = 0; i < 31; i++)
+            {
+                Console.WriteLine();
+            }
+            Console.WriteLine("\x1b[3J"); //thanks sharplabs https://stackoverflow.com/questions/75471607/console-clear-doesnt-clean-up-the-whole-console
+        }
+        
+
+        Console.SetCursorPosition(0, 0);
+        Console.BackgroundColor = SavedColor;
+    }
     public static void WorkingWriteLine(string Message = "") //Write Line that does not bleed over
     {
         ConsoleColor temp = Console.BackgroundColor;
@@ -20,7 +37,7 @@ class Program
         ConsoleColor KingColor = ConsoleColor.Gray;
         const int TileSize = 6;
         const int HalfTheAmountOfTiles = 4;
-        Console.Clear();
+        
         #region Top Border
         Console.BackgroundColor = ConsoleColor.Gray;
         Console.Write("  ");
@@ -225,8 +242,28 @@ class Program
 
     public static void Main(string[] args)
     {
-        ushort[] GameState = { 0b101101101101, 585, 585, 0, 0, 1755, 1755, 0b1111111111111111 };
-        VisualizeGame(GameState);
+
+        ushort[] GameState = { 0, 0, 0, 0, 0, 0, 0, 0b000111000000 };
+        CheckerBoard GameBoard = new CheckerBoard(GameState);
+       
+        for (int i = 0; i < 2; i++)
+        {
+            VisualizeGame(GameBoard.Board);
+        }
+        Console.ReadKey();
+        WorkingClear();
+        
+        /*
+        List<ushort[]> NextBoards = GameBoard.GetNextMoveLocations(true);
+        for (int i = 0; i < NextBoards.Count; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                WorkingWriteLine();
+            }
+            VisualizeGame(NextBoards[i]);
+        }
+        */
         Console.ReadKey();
     }
 }
