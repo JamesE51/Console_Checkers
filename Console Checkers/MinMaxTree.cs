@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Console_Checkers
-{
+{/*
     internal class MinMaxTree<T>
     {
         MinMaxNode<T> Head;
@@ -42,5 +42,5 @@ namespace Console_Checkers
 
 
 
-    }
+    }*/
 }

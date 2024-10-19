@@ -12,10 +12,8 @@ class Program
             {
                 Console.WriteLine();
             }
-            Console.WriteLine("\x1b[3J"); //thanks sharplabs https://stackoverflow.com/questions/75471607/console-clear-doesnt-clean-up-the-whole-console
+            Console.WriteLine("\x1b[3J"); //thanks stack overflow https://stackoverflow.com/questions/75471607/console-clear-doesnt-clean-up-the-whole-console
         }
-        
-
         Console.SetCursorPosition(0, 0);
         Console.BackgroundColor = SavedColor;
     }
@@ -37,7 +35,7 @@ class Program
         ConsoleColor KingColor = ConsoleColor.Gray;
         const int TileSize = 6;
         const int HalfTheAmountOfTiles = 4;
-        
+
         #region Top Border
         Console.BackgroundColor = ConsoleColor.Gray;
         Console.Write("  ");
@@ -105,7 +103,7 @@ class Program
                             }
                             ConsoleColor SavedColor = Console.BackgroundColor;
                             Console.Write("  ");
-                            
+
                             if (Curr.HasFlag(TileType.HasChecker))
                             {
                                 if (Curr.HasFlag(TileType.Player))
@@ -243,18 +241,17 @@ class Program
     public static void Main(string[] args)
     {
 
-        ushort[] GameState = { 0, 0, 0, 0, 0, 0, 0, 0b000111000000 };
+        ushort[] GameState = { 0, 3, 0b_000000001000, 0b_000000011000, 0, 0, 0, 0 };
         CheckerBoard GameBoard = new CheckerBoard(GameState);
-       
-        for (int i = 0; i < 2; i++)
-        {
-            VisualizeGame(GameBoard.Board);
-        }
-        Console.ReadKey();
-        WorkingClear();
+
+
+        VisualizeGame(GameBoard.Board);
+
+
         
-        /*
-        List<ushort[]> NextBoards = GameBoard.GetNextMoveLocations(true);
+
+
+        List<ushort[]> NextBoards = GameBoard.GetNextMoveLocations(true).Boards;
         for (int i = 0; i < NextBoards.Count; i++)
         {
             for (int j = 0; j < 5; j++)
@@ -263,7 +260,7 @@ class Program
             }
             VisualizeGame(NextBoards[i]);
         }
-        */
+
         Console.ReadKey();
     }
 }
