@@ -241,7 +241,7 @@ class Program
     public static void Main(string[] args)
     {
 
-        ushort[] GameState = { 0, 3, 0b_000000001000, 0b_000000011000, 0, 0, 0, 0 };
+        ushort[] GameState = { 3, 3, 3, 0, 0, 0, 0b_000_001_001_000, 0b_000_000_011_000 };
         CheckerBoard GameBoard = new CheckerBoard(GameState);
 
 

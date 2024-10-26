@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace Console_Checkers
 {
-    
+
     [Flags]
     public enum TileType
     {
@@ -46,11 +46,12 @@ namespace Console_Checkers
         {
             Board = board;
         }
-        public (List<ushort[]> Boards, bool Jumped) GetNextMoveLocations(bool PlayerTurn)
+
+        public List<(ushort[], Point?)> GetNextMoveLocations(bool PlayerTurn)
         {
-            List<(ushort[] Board, bool Jumped)> PossibleBoardStates = [];
+            List<(ushort[] Board, Point? Jumped)> PossibleBoardStates = [];
             bool MustJump = false;
-            
+
             for (int i = 0; i < Board.Length; i++)
             {
                 for (int j = 0; j < 12; j += 3)
@@ -82,7 +83,7 @@ namespace Console_Checkers
                         PossibleMoves.Add(Directions.UpLeft);
                         PossibleMoves.Add(Directions.UpRight);
                     }
-                    if(!CurrTile.HasFlag(TileType.Player) || CurrTile.HasFlag(TileType.King))
+                    if (!CurrTile.HasFlag(TileType.Player) || CurrTile.HasFlag(TileType.King))
                     {
                         PossibleMoves.Add(Directions.DownLeft);
                         PossibleMoves.Add(Directions.DownRight);
@@ -93,19 +94,19 @@ namespace Console_Checkers
                         PossibleMoves.RemoveAll(x => !x.HasFlag(Directions.Down));
                     }
                     else if (CurrPoint.Y == 7) //if its the bottom
-                    { 
+                    {
                         PossibleMoves.RemoveAll(x => x.HasFlag(Directions.Down));
                     }
-                    if (CurrPoint.X == 0 && ((CurrPoint.Y-1) % 2 == 1)) //leftmost
+                    if (CurrPoint.X == 0 && (CurrPoint.Y % 2 == 0)) //leftmost
                     {
                         PossibleMoves.RemoveAll(x => x.HasFlag(Directions.Left));
                     }
-                    else if (CurrPoint.X == 12 && ((CurrPoint.Y - 1) % 2 == 0)) //rightmost
+                    else if (CurrPoint.X == 12 && (CurrPoint.Y % 2 == 1)) //rightmost
                     {
                         PossibleMoves.RemoveAll(x => !x.HasFlag(Directions.Left));
                     }
                     #endregion
-                    
+
                     for (int k = 0; k < PossibleMoves.Count; k++)
                     {
                         Point Shift = new Point();
@@ -120,7 +121,7 @@ namespace Console_Checkers
                         }
                         if (PossibleMoves[k].HasFlag(Directions.Left))
                         {
-                            if ((CurrPoint.Y-1) % 2 == 0)
+                            if ((CurrPoint.Y - 1) % 2 == 0)
                             {
                                 Shift.X = CurrPoint.X;
                             }
@@ -128,7 +129,7 @@ namespace Console_Checkers
                             {
                                 Shift.X = CurrPoint.X - 3;
                             }
-                            
+
                         }
                         else
                         {
@@ -154,7 +155,7 @@ namespace Console_Checkers
                                 ushort[] TempBoardState = Board.ToArray();
                                 TempBoardState[CurrPoint.Y] = (ushort)(TempBoardState[CurrPoint.Y] & (~(int)(Math.Pow(2, CurrPoint.X) + Math.Pow(2, CurrPoint.X + 1) + Math.Pow(2, CurrPoint.X + 2)))); //remove the checker
                                 TempBoardState[Shift.Y] = (ushort)(TempBoardState[Shift.Y] | (int)CurrTile << Shift.X);
-                                PossibleBoardStates.Add((TempBoardState, false));
+                                PossibleBoardStates.Add((TempBoardState, null));
                             }
                         }
                         else
@@ -165,7 +166,7 @@ namespace Console_Checkers
                                 //checking if can jump
                                 Point BehindTilePoint = new();
                                 #region Checking if the tile behind exists and getting the tile behind it
-                                if (PossibleMoves[k].HasFlag(Directions.Left)) 
+                                if (PossibleMoves[k].HasFlag(Directions.Left))
                                 {
                                     if (CurrPoint.X == 0) //if it cannot go left
                                     {
@@ -173,7 +174,7 @@ namespace Console_Checkers
                                     }
                                     BehindTilePoint.X = CurrPoint.X - 3;
                                 }
-                                else 
+                                else
                                 {
                                     if (CurrPoint.X == 12)
                                     {
@@ -189,7 +190,7 @@ namespace Console_Checkers
                                     }
                                     BehindTilePoint.Y = CurrPoint.Y - 2;
                                 }
-                                else 
+                                else
                                 {
                                     if (CurrPoint.Y > 5)
                                     {
@@ -198,7 +199,7 @@ namespace Console_Checkers
                                     BehindTilePoint.Y = CurrPoint.Y + 2;
                                 }
 
-                                
+
                                 #endregion
                                 TileType TileBehindTile = (TileType)((Board[BehindTilePoint.Y] >> BehindTilePoint.X) & 7);
                                 if (!TileBehindTile.Equals(TileType.None)) //if there is a checker behind it, it skips
@@ -207,9 +208,11 @@ namespace Console_Checkers
                                 }
                                 #region The Jumping
                                 MustJump = true;
-
-
-
+                                ushort[] TempBoardState = Board.ToArray();
+                                TempBoardState[CurrPoint.Y] = (ushort)(TempBoardState[CurrPoint.Y] & (~(int)(Math.Pow(2, CurrPoint.X) + Math.Pow(2, CurrPoint.X + 1) + Math.Pow(2, CurrPoint.X + 2)))); //removes checker
+                                TempBoardState[Shift.Y] = (ushort)(TempBoardState[Shift.Y] & (~(int)(Math.Pow(2, Shift.X) + Math.Pow(2, Shift.X + 1) + Math.Pow(2, Shift.X + 2)))); //removes enemy checke
+                                TempBoardState[BehindTilePoint.Y] = (ushort)(TempBoardState[BehindTilePoint.Y] | (int)CurrTile << BehindTilePoint.X);
+                                PossibleBoardStates.Add((TempBoardState, BehindTilePoint));
                                 #endregion
                                 //RecursiveJumping(Board,CurrPoint,CurrTile);
                             }
@@ -218,21 +221,22 @@ namespace Console_Checkers
                 }
             }
             //checking possible board states
-            #region Returning Board States But Filtering If Jump Is Forced
-            List<ushort[]> SurvivingBoardStates = [];
+            #region Returning Board States But Filtering Out Non Jump Moves If Jump Is Forced
+            List<(ushort[], Point?)> SurvivingBoardStates = [];
             for (int i = 0; i < PossibleBoardStates.Count; i++)
             {
-                if (PossibleBoardStates[i].Jumped == false && MustJump)
-                {
-                    continue;
+                if (PossibleBoardStates[i].Jumped == null && MustJump)
+                { 
+                    continue; 
                 }
-                SurvivingBoardStates.Add(PossibleBoardStates[i].Board);
+                SurvivingBoardStates.Add(PossibleBoardStates[i]);
             }
-            return (SurvivingBoardStates, MustJump);
+            
+            return (SurvivingBoardStates);
             #endregion
         }
-        
-       
+
+
         /*
         public List<int[]> RecursiveJumping(ushort[] Board, Point CurrPos, TileType Curr)
         {
@@ -246,5 +250,5 @@ namespace Console_Checkers
 
 
     }
-   
+
 }
