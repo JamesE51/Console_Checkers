@@ -1,4 +1,5 @@
 ﻿using Console_Checkers;
+using System.Drawing;
 
 class Program
 {
@@ -241,7 +242,7 @@ class Program
     public static void Main(string[] args)
     {
 
-        ushort[] GameState = { 3, 3, 3, 0, 0, 0, 0b_000_001_001_000, 0b_000_000_011_000 };
+        ushort[] GameState = { 0, 0, 0, 0b000_011_000_000, 0b101_101_000_000, 0b000_011_000_000, 0, 0 };
         CheckerBoard GameBoard = new CheckerBoard(GameState);
 
 
@@ -250,15 +251,15 @@ class Program
 
         
 
-
-        List<ushort[]> NextBoards = GameBoard.GetNextMoveLocations(true).Boards;
+        
+        List<(ushort[], Point?)> NextBoards = GameBoard.GetNextMoveLocations(false);
         for (int i = 0; i < NextBoards.Count; i++)
         {
             for (int j = 0; j < 5; j++)
             {
                 WorkingWriteLine();
             }
-            VisualizeGame(NextBoards[i]);
+            VisualizeGame(NextBoards[i].Item1);
         }
 
         Console.ReadKey();

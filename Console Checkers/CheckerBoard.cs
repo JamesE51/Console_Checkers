@@ -182,7 +182,7 @@ namespace Console_Checkers
                                     }
                                     BehindTilePoint.X = CurrPoint.X + 3;
                                 }
-                                if (PossibleMoves[k].HasFlag(Directions.Up))
+                                if (!PossibleMoves[k].HasFlag(Directions.Down))
                                 {
                                     if (CurrPoint.Y < 2)
                                     {
@@ -235,18 +235,46 @@ namespace Console_Checkers
             return (SurvivingBoardStates);
             #endregion
         }
-
-
-        /*
-        public List<int[]> RecursiveJumping(ushort[] Board, Point CurrPos, TileType Curr)
+        
+        
+        
+        public List<ushort[]> SingleJumping(ushort[] Board, Point CurrPoint, TileType Curr)
         {
+            List<Directions> PossibleMoves = new();
             //setting what opposing checker it will look for
-            
+            if (Curr.HasFlag(TileType.Player) || Curr.HasFlag(TileType.King))
+            {
+                PossibleMoves.Add(Directions.Up);
+                PossibleMoves.Add(Directions.UpRight);
+            }
+            if (!Curr.HasFlag(TileType.Player) || Curr.HasFlag(TileType.King))
+            {
+                PossibleMoves.Add(Directions.DownLeft);
+                PossibleMoves.Add(Directions.DownRight);
+            }
+            #region Removing Directions Depending On Wether It's On An Edge
+            if (CurrPoint.Y == 0) //if its the top
+            {
+                PossibleMoves.RemoveAll(x => !x.HasFlag(Directions.Down));
+            }
+            else if (CurrPoint.Y == 7) //if its the bottom
+            {
+                PossibleMoves.RemoveAll(x => x.HasFlag(Directions.Down));
+            }
+            if (CurrPoint.X == 0 && (CurrPoint.Y % 2 == 0)) //leftmost
+            {
+                PossibleMoves.RemoveAll(x => x.HasFlag(Directions.Left));
+            }
+            else if (CurrPoint.X == 12 && (CurrPoint.Y % 2 == 1)) //rightmost
+            {
+                PossibleMoves.RemoveAll(x => !x.HasFlag(Directions.Left));
+            }
+            #endregion
+
 
             
-            //if no moves
-            
-        }*/
+
+        }
 
 
     }
