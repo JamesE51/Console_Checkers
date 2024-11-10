@@ -41,6 +41,17 @@ namespace Console_Checkers
 
     internal class CheckerBoard
     {
+        /// <summary>
+        /// Removes a checker from a row on the board
+        /// </summary>
+        /// <param name="BoardLine">The affected row on the board</param>
+        /// <param name="CurrX">The least significant bit of the (3-bit) checker to remove</param>
+        /// <returns>The updated row</returns>
+        private static ushort RemoveChecker(ushort BoardLine, int CurrX) => (ushort)(BoardLine & ~(0B_111 << CurrX));
+
+        //private ushort RemoveChecker(ushort BoardLine, int CurrX) => (ushort)(BoardLine & (~(int)(Math.Pow(2, CurrX) + Math.Pow(2, CurrX + 1) + Math.Pow(2, CurrX + 2))));
+        
+        
         public ushort[] Board = new ushort[8]; //each 3 bits is a peice First: 0 is empty, 1 is not. Second: 0 is Black, 1 is Red, Third: 0 is Normal, 1 is King
         public CheckerBoard(ushort[] board)
         {
@@ -153,7 +164,7 @@ namespace Console_Checkers
                             else
                             {
                                 ushort[] TempBoardState = Board.ToArray();
-                                TempBoardState[CurrPoint.Y] = (ushort)(TempBoardState[CurrPoint.Y] & (~(int)(Math.Pow(2, CurrPoint.X) + Math.Pow(2, CurrPoint.X + 1) + Math.Pow(2, CurrPoint.X + 2)))); //remove the checker
+                                TempBoardState[CurrPoint.Y] = RemoveChecker(TempBoardState[CurrPoint.Y], CurrPoint.X);
                                 TempBoardState[Shift.Y] = (ushort)(TempBoardState[Shift.Y] | (int)CurrTile << Shift.X);
                                 PossibleBoardStates.Add((TempBoardState, null));
                             }
@@ -202,15 +213,16 @@ namespace Console_Checkers
 
                                 #endregion
                                 TileType TileBehindTile = (TileType)((Board[BehindTilePoint.Y] >> BehindTilePoint.X) & 7);
-                                if (!TileBehindTile.Equals(TileType.None)) //if there is a checker behind it, it skips
+                                if (!TileBehindTile.Equals(TileType.None)) //if there is a checker behind it, it continues
                                 {
                                     continue;
                                 }
                                 #region The Jumping
                                 MustJump = true;
                                 ushort[] TempBoardState = Board.ToArray();
-                                TempBoardState[CurrPoint.Y] = (ushort)(TempBoardState[CurrPoint.Y] & (~(int)(Math.Pow(2, CurrPoint.X) + Math.Pow(2, CurrPoint.X + 1) + Math.Pow(2, CurrPoint.X + 2)))); //removes checker
-                                TempBoardState[Shift.Y] = (ushort)(TempBoardState[Shift.Y] & (~(int)(Math.Pow(2, Shift.X) + Math.Pow(2, Shift.X + 1) + Math.Pow(2, Shift.X + 2)))); //removes enemy checke
+                                
+                                TempBoardState[CurrPoint.Y] = RemoveChecker(TempBoardState[CurrPoint.Y], CurrPoint.X);
+                                TempBoardState[Shift.Y] = RemoveChecker(TempBoardState[Shift.Y],Shift.X); //removes enemy checker (same as above but Shift.X) is the position of the enemy checker
                                 TempBoardState[BehindTilePoint.Y] = (ushort)(TempBoardState[BehindTilePoint.Y] | (int)CurrTile << BehindTilePoint.X);
                                 PossibleBoardStates.Add((TempBoardState, BehindTilePoint));
                                 #endregion
@@ -237,8 +249,7 @@ namespace Console_Checkers
         }
         
         
-        
-        public List<ushort[]> SingleJumping(ushort[] Board, Point CurrPoint, TileType Curr)
+        public List<(ushort[], Point?)> SingleJumping (ushort[] Board, Point CurrPoint, TileType Curr)
         {
             List<Directions> PossibleMoves = new();
             //setting what opposing checker it will look for
@@ -270,9 +281,45 @@ namespace Console_Checkers
                 PossibleMoves.RemoveAll(x => !x.HasFlag(Directions.Left));
             }
             #endregion
+            Point OtherChecker = new();
+            for (int i = 0; i < PossibleMoves.Count; i++)
+            {
+                #region Getting Other Checker Location
+                if (PossibleMoves[i].HasFlag(Directions.Down))
+                {
+                    OtherChecker.Y = CurrPoint.Y + 1;
+                }
+                else
+                {
+                    OtherChecker.Y = CurrPoint.Y - 1;
+                }
+                if (PossibleMoves[i].HasFlag(Directions.Left))
+                {
+                    if ((CurrPoint.Y - 1) % 2 == 0)
+                    {
+                        OtherChecker.X = CurrPoint.X;
+                    }
+                    else
+                    {
+                        OtherChecker.X = CurrPoint.X - 3;
+                    }
+
+                }
+                else
+                {
+                    if ((CurrPoint.Y - 1) % 2 == 1)
+                    {
+                        OtherChecker.X = CurrPoint.X;
+                    }
+                    else
+                    {
+                        OtherChecker.X = CurrPoint.X + 3;
+                    }
+                }
+                #endregion
+            }
 
 
-            
 
         }
 
