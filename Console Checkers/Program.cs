@@ -242,15 +242,15 @@ class Program
     public static void Main(string[] args)
     {
 
-        ushort[] GameState = { 0, 0, 0, 0, 0, 0, 0b_000_001_001_000, 0b_000_000_011_000 };
+        ushort[] GameState = { 0, 0, 0, 0, 0, 0, 0b_000_000_011_000, 0b_000_000_011_000 };
         CheckerBoard GameBoard = new CheckerBoard(GameState);
 
 
         VisualizeGame(GameBoard.Board);
 
-
+        GameBoard.SingleJumping(GameBoard.Board,new Point(3,7),TileType.PlayerPawn);
         
-
+        
         
         List<(ushort[], Point?)> NextBoards = GameBoard.GetNextMoveLocations(true);
         for (int i = 0; i < NextBoards.Count; i++)

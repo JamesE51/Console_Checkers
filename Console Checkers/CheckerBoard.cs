@@ -251,12 +251,13 @@ namespace Console_Checkers
         
         public List<(ushort[], Point?)> SingleJumping (ushort[] Board, Point CurrPoint, TileType Curr)
         {
-            List<Directions> PossibleMoves = new();
+            List<(ushort[], Point?)> PossibleJumps = [];
+            List<Directions> PossibleMoves = [];
             //setting what opposing checker it will look for
             if (Curr.HasFlag(TileType.Player) || Curr.HasFlag(TileType.King))
             {
-                PossibleMoves.Add(Directions.Up);
                 PossibleMoves.Add(Directions.UpRight);
+                PossibleMoves.Add(Directions.UpLeft);
             }
             if (!Curr.HasFlag(TileType.Player) || Curr.HasFlag(TileType.King))
             {
@@ -281,46 +282,72 @@ namespace Console_Checkers
                 PossibleMoves.RemoveAll(x => !x.HasFlag(Directions.Left));
             }
             #endregion
-            Point OtherChecker = new();
+            Point OtherCheckerPos = new();
+            Point JumpPos = new();
             for (int i = 0; i < PossibleMoves.Count; i++)
             {
-                #region Getting Other Checker Location
+                #region Getting Other Checker and Jump to Location
                 if (PossibleMoves[i].HasFlag(Directions.Down))
                 {
-                    OtherChecker.Y = CurrPoint.Y + 1;
+                    OtherCheckerPos.Y = CurrPoint.Y + 1;
+                    JumpPos.Y = CurrPoint.Y + 2;
                 }
                 else
                 {
-                    OtherChecker.Y = CurrPoint.Y - 1;
+                    OtherCheckerPos.Y = CurrPoint.Y - 1;
+                    JumpPos.Y = CurrPoint.Y + 2;
                 }
                 if (PossibleMoves[i].HasFlag(Directions.Left))
                 {
+                    JumpPos.X = CurrPoint.X - 3;
                     if ((CurrPoint.Y - 1) % 2 == 0)
                     {
-                        OtherChecker.X = CurrPoint.X;
+                        OtherCheckerPos.X = CurrPoint.X;
                     }
                     else
                     {
-                        OtherChecker.X = CurrPoint.X - 3;
+                        OtherCheckerPos.X = CurrPoint.X - 3;
                     }
 
                 }
                 else
                 {
+                    JumpPos.X = CurrPoint.X + 3;
                     if ((CurrPoint.Y - 1) % 2 == 1)
                     {
-                        OtherChecker.X = CurrPoint.X;
+                        OtherCheckerPos.X = CurrPoint.X;
                     }
                     else
                     {
-                        OtherChecker.X = CurrPoint.X + 3;
+                        OtherCheckerPos.X = CurrPoint.X + 3;
                     }
                 }
                 #endregion
+                #region Cases Where Checker Can't Jump
+                TileType OtherChecker = (TileType)((Board[OtherCheckerPos.Y] >> OtherCheckerPos.X) & 7);
+                if (OtherChecker == 0
+                    || (int)OtherChecker == ((int)Curr & 0b_010)
+                    || OtherCheckerPos.Y == 7
+                    || OtherCheckerPos.Y == 0
+                    || OtherCheckerPos.X == 0
+                    || OtherCheckerPos.X == 9)
+                {
+                    continue;
+                }
+                TileType JumpChecker = (TileType)((Board[JumpPos.Y] >> JumpPos.X) & 7); //if this crashes the checker somehow found a way to jump out of bounds
+                if (JumpChecker != 0)
+                {
+                    continue;
+                }
+                #endregion
+                var TempBoard = Board.ToArray();
+                TempBoard[CurrPoint.Y] = RemoveChecker(TempBoard[CurrPoint.Y], CurrPoint.X); //rempving the original jump checker
+                TempBoard[OtherCheckerPos.Y] = RemoveChecker(TempBoard[OtherCheckerPos.Y], OtherCheckerPos.X); //removing the checker jumped over
+                TempBoard[]
             }
 
 
-
+            return null;
         }
 
 
