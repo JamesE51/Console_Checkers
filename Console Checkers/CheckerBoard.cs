@@ -343,7 +343,8 @@ namespace Console_Checkers
                 var TempBoard = Board.ToArray();
                 TempBoard[CurrPoint.Y] = RemoveChecker(TempBoard[CurrPoint.Y], CurrPoint.X); //rempving the original jump checker
                 TempBoard[OtherCheckerPos.Y] = RemoveChecker(TempBoard[OtherCheckerPos.Y], OtherCheckerPos.X); //removing the checker jumped over
-                TempBoard[]
+                TempBoard[JumpPos.Y] = (ushort)(TempBoard[JumpPos.Y] | (ushort)Curr << JumpPos.X);
+                    //TempBoardState[Shift.Y] = (ushort)(TempBoardState[Shift.Y] | (int)CurrTile << Shift.X);
             }
 
 

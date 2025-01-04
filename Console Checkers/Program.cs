@@ -18,12 +18,13 @@ class Program
         Console.SetCursorPosition(0, 0);
         Console.BackgroundColor = SavedColor;
     }
-    public static void WorkingWriteLine(string Message = "") //Write Line that does not bleed over
+   
+    public static void WorkingWriteLine(string text = "")
     {
         ConsoleColor temp = Console.BackgroundColor;
-        Console.Write(Message);
+        Console.Write(text);
         Console.BackgroundColor = ConsoleColor.Black;
-        Console.WriteLine("");
+        Console.WriteLine();
         Console.BackgroundColor = temp;
     }
 
@@ -241,6 +242,11 @@ class Program
 
     public static void Main(string[] args)
     {
+        #region Clearin console to avoid line bleeding
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.Clear();
+        #endregion
+
 
         ushort[] GameState = { 0, 0, 0, 0, 0, 0, 0b_000_000_011_000, 0b_000_000_011_000 };
         CheckerBoard GameBoard = new CheckerBoard(GameState);
@@ -248,7 +254,7 @@ class Program
 
         VisualizeGame(GameBoard.Board);
 
-        GameBoard.SingleJumping(GameBoard.Board,new Point(3,7),TileType.PlayerPawn);
+      //  GameBoard.SingleJumping(GameBoard.Board,new Point(3,7),TileType.PlayerPawn);
         
         
         
