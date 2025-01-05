@@ -1,5 +1,7 @@
 ﻿using Console_Checkers;
 using System.Drawing;
+using static Console_Checkers.NativeMethods;
+using System.Runtime.InteropServices;
 
 class Program
 {
@@ -22,14 +24,17 @@ class Program
     public static void WorkingWriteLine(string text = "")
     {
         ConsoleColor temp = Console.BackgroundColor;
-        Console.Write(text);
+
         Console.BackgroundColor = ConsoleColor.Black;
         Console.WriteLine();
+
         Console.BackgroundColor = temp;
+        Console.Write(text);
     }
 
     public static void VisualizeGame(ushort[] GameState) //top left and other red tiles are the empty ones
     {
+        WorkingWriteLine();
         ConsoleColor PlayerColor = ConsoleColor.Red;
         ConsoleColor ComColor = ConsoleColor.Blue;
         ConsoleColor TileColorOne = ConsoleColor.Black;
@@ -240,25 +245,32 @@ class Program
 
     }
 
+    static CheckerBoard gameBoard; 
     public static void Main(string[] args)
     {
         #region Clearin console to avoid line bleeding
         Console.BackgroundColor = ConsoleColor.Black;
         Console.Clear();
         #endregion
+        ConsoleListener.WindowBufferSizeEvent += bufferSizeHandler;
 
-
-        ushort[] GameState = { 0, 0, 0, 0, 0, 0, 0b_000_000_011_000, 0b_000_000_011_000 };
-        CheckerBoard GameBoard = new CheckerBoard(GameState);
-
-
-        VisualizeGame(GameBoard.Board);
-
+        ushort[] gameState = { 0b_001_001_001_001, 0b_001_001_001_001, 0b_001_001_001_001, 0, 0, 0b_011_011_011_011, 0b_011_011_011_011, 0b_011_011_011_011 };
+        gameBoard = new CheckerBoard(gameState);
+        bool somebodyWon = false;
+        while (!somebodyWon)
+        {
+            //Showing Board
+            VisualizeGame(gameBoard.Board);
+            ConsoleListener.Start();
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.WriteLine("Your move.");
+            Console.ReadKey();
+        }
       //  GameBoard.SingleJumping(GameBoard.Board,new Point(3,7),TileType.PlayerPawn);
         
         
         
-        List<(ushort[], Point?)> NextBoards = GameBoard.GetNextMoveLocations(true);
+        List<(ushort[], Point?)> NextBoards = gameBoard.GetNextMoveLocations(true);
         for (int i = 0; i < NextBoards.Count; i++)
         {
             for (int j = 0; j < 5; j++)
@@ -269,5 +281,15 @@ class Program
         }
 
         Console.ReadKey();
+    }
+
+    private static void bufferSizeHandler(NativeMethods.WINDOW_BUFFER_SIZE_RECORD r)
+    {
+        //clears screen
+        WorkingClear();
+        Console.BackgroundColor = ConsoleColor.Black;
+        WorkingWriteLine("Please do not adjust the screen often, as it may cause issues.");
+        VisualizeGame(gameBoard.Board);
+        WorkingWriteLine("Your turn.");
     }
 }
