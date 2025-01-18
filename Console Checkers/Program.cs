@@ -248,6 +248,11 @@ class Program
     static CheckerBoard gameBoard; 
     public static void Main(string[] args)
     {
+        var val=Environment.Version; //8.0.11
+        var val2 = Environment.Version.Minor; //0
+        var val3 = Environment.Version.Major; //8
+        var val4 = Environment.Version.Revision; //-1
+        ;
         #region Clearin console to avoid line bleeding
         Console.BackgroundColor = ConsoleColor.Black;
         Console.Clear();
@@ -286,8 +291,9 @@ class Program
     private static void bufferSizeHandler(NativeMethods.WINDOW_BUFFER_SIZE_RECORD r)
     {
         //clears screen
-        WorkingClear();
         Console.BackgroundColor = ConsoleColor.Black;
+        WorkingClear();
+        //Console.BackgroundColor = ConsoleColor.Black;
         WorkingWriteLine("Please do not adjust the screen often, as it may cause issues.");
         VisualizeGame(gameBoard.Board);
         WorkingWriteLine("Your turn.");
